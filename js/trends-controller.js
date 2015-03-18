@@ -138,7 +138,6 @@ app.controller('TrendsController', ['$scope', '$http', '$q', '$interval', functi
   /* COMMON FUNCTIONS */
 
   function sortNumber(a,b){
-   console.log(typeof a.changePercent);
    return parseFloat(b.changePercent) - parseFloat(a.changePercent) ;
   }
 
