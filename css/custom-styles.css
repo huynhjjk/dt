@@ -1,0 +1,79 @@
+/* DT */
+.symbol {
+	font-size: 1.5em;
+}
+
+.symbol-text {
+	font-size: 2.0em;
+	font-weight: bold;
+}
+
+.symbol-current {
+	font-size: 1.8em;
+}
+
+.symbol-green {
+	color: green;
+}
+
+.symbol-red {
+	color: red;
+}
+
+/* Default */
+h1 {
+	padding: 1em 0em;
+}
+
+p {
+	font-size: 1.5em;
+}
+
+.main {
+	margin-top: 2em;
+}
+
+/* Navigation Bar */
+.navbar-custom {
+	background-color: transparent;
+	border-color: transparent;
+}
+
+.navbar-custom a.navbar-brand,
+.navbar-custom .navbar-nav>li>a {
+	color: black;	
+	background-color: transparent;
+}
+
+.navbar-custom a.navbar-brand:hover,
+.navbar-custom .navbar-nav>li>a:hover,
+.navbar-custom .navbar-nav>.active>a,
+.navbar-custom .navbar-nav>.active>a:hover,
+.navbar-custom .navbar-nav>.active>a:focus {
+	color: green;
+	background-color: transparent;
+}
+
+/* Footer */
+footer {
+	font-size: 1.4em;
+}
+
+footer ul {
+	margin: 0;
+	padding: 1em 0em;
+	list-style-type: none;
+}
+
+footer ul li {
+	display: inline;
+}
+
+footer ul li a{
+	text-decoration: none;
+}
+
+footer ul li a img {
+	width: 1.7em;
+	height: 1.7em;
+}
