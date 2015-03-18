@@ -75,76 +75,70 @@ app.controller('TrendsController', ['$scope', '$http', '$q', '$interval', functi
       var stock = {
         // Google Finance
         symbol: googleFinanceStocks[j].t,
-        current: googleFinanceStocks[j].l,
-        changePrice: googleFinanceStocks[j].c,
-        changePercent: googleFinanceStocks[j].cp,
-        lastPurchase: googleFinanceStocks[j].elt,
-        div: googleFinanceStocks[j].div,
+        current: parseFloat(googleFinanceStocks[j].l),
+        changePrice: parseFloat(googleFinanceStocks[j].c),
+        changePercent: parseFloat(googleFinanceStocks[j].cp),
+        lastPurchase: googleFinanceStocks[j].lt,
+        div: parseFloat(googleFinanceStocks[j].div),
+        isTrending: ($scope.trendingStocks.indexOf(googleFinanceStocks[j].t) != -1) ? true:false,
+        trendingRank: ($scope.trendingStocks.indexOf(googleFinanceStocks[j].t) != -1) ? $scope.trendingStocks.indexOf(googleFinanceStocks[j].t) + 1: -1,
         // Yahoo Finance
         name: yahooFinanceStocks[j].Name,
-        averageDailyVolume: yahooFinanceStocks[j].AverageDailyVolume,
-        open: yahooFinanceStocks[j].Open,
-        close: yahooFinanceStocks[j].PreviousClose,
-        daysHigh: yahooFinanceStocks[j].DaysHigh,
-        daysLow: yahooFinanceStocks[j].DaysLow,
-        yearHigh: yahooFinanceStocks[j].YearHigh,
-        yearLow: yahooFinanceStocks[j].YearLow,
-        estimateCurrentYear: yahooFinanceStocks[j].EPSEstimateCurrentYear,
-        estimateNextQuarter: yahooFinanceStocks[j].EPSEstimateNextQuarter,
-        estimateNextYear: yahooFinanceStocks[j].EPSEstimateNextYear,
-        fiftyDayMovingAverage: yahooFinanceStocks[j].FiftydayMovingAverage
+        averageDailyVolume: parseFloat(yahooFinanceStocks[j].AverageDailyVolume),
+        open: parseFloat(yahooFinanceStocks[j].Open),
+        close: parseFloat(yahooFinanceStocks[j].PreviousClose),
+        daysHigh: parseFloat(yahooFinanceStocks[j].DaysHigh),
+        daysLow: parseFloat(yahooFinanceStocks[j].DaysLow),
+        yearHigh: parseFloat(yahooFinanceStocks[j].YearHigh),
+        yearLow: parseFloat(yahooFinanceStocks[j].YearLow),
+        estimateCurrentYear: parseFloat(yahooFinanceStocks[j].EPSEstimateCurrentYear),
+        estimateNextQuarter: parseFloat(yahooFinanceStocks[j].EPSEstimateNextQuarter),
+        estimateNextYear: parseFloat(yahooFinanceStocks[j].EPSEstimateNextYear),
+        fiftyDayMovingAverage: parseFloat(yahooFinanceStocks[j].FiftydayMovingAverage)
       }
       stocks.push(stock);
     }
     return stocks;
   }
 
-
   var getTrendingStocksData = function() {
-    // getTrendingStockTwitsTickers.then(function(symbols) {
-
-    // getAllSymbols().then(function(symbols) {
       var symbols = getAllSymbols();
       var symbolsPerCall = 116;
       var originalSymbolSize = angular.copy(symbols.length);      
       var iterate = Math.floor(originalSymbolSize / symbolsPerCall);
-      $scope.stocks = [];
+
+      var tempStocks = [];
       for (var i = 0; i < iterate; i++) {
         var sendToPromise = symbols.splice(0, symbolsPerCall);
         getStocks(sendToPromise).then(function(data) {
-          $scope.stocks = $scope.stocks.concat(formatStocks(data));
-          console.log('Making Call');
-        //console.log($scope.stocks);
+          tempStocks = tempStocks.concat(formatStocks(data));
         });
 
       }
       getStocks(symbols).then(function(data) {
-        $scope.stocks = $scope.stocks.concat(formatStocks(data));        
-        $scope.stocks = $scope.stocks.sort(sortNumber);    
+        tempStocks = tempStocks.concat(formatStocks(data));        
+        $scope.stocks = tempStocks;
         console.log('Making Last Call');
+        console.log($scope.stocks[0]);
       });
   }
 
-
-  // Upon pageload
-  getTrendingStocksData();
-
-  // 30 second intervals
- /* $interval(function() {
+  
+  getTrendingStockTwitsTickers().then(function(trendingStocks) {
+    $scope.trendingStocks = trendingStocks;
     getTrendingStocksData();
-  }, 30000);*/
+  });
+
+
+  //15 second intervals
+  $interval(function() {
+    getTrendingStocksData();
+  }, 15000);
 
 
   /* COMMON FUNCTIONS */
-
-  function sortNumber(a,b){
-   console.log(typeof a.changePercent);
-   return parseFloat(b.changePercent) - parseFloat(a.changePercent) ;
-  }
-
   $scope.isPositive = function(stock) {
-    var index = stock.indexOf('+');
-    return (index != -1) ? true : false;
+    return (stock > 0) ? true : false;
   }
 
 }]);

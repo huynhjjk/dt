@@ -41,7 +41,7 @@
         <div class="container main">
           <h1 class="text-center">Top Trending</h1>
           <ol>
-            <li ng-repeat="stock in stocks">
+            <li ng-repeat="stock in stocks | orderBy:'changePercent':true">
               <div class="symbol">
                 <span class="symbol-text">{{stock.symbol}}</span>
                 <span class="symbol-current">{{stock.current}}</span>
@@ -51,6 +51,9 @@
 
                 <span ng-class="{'symbol-green' : isPositive(stock.changePrice), 'symbol-red' : !isPositive(stock.changePrice)}">{{stock.changePrice}} ({{stock.changePercent}}%)             
                 </span>
+
+                <span class="glyphicon glyphicon-eye-open" ng-if="stock.isTrending"></span>
+                
               </div>
               <div class="row">
                 <div class="col-xs-12 col-md-6">
