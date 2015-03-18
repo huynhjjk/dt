@@ -99,6 +99,7 @@ app.controller('TrendsController', ['$scope', '$http', '$q', '$interval', functi
     return stocks;
   }
 
+
   var getTrendingStocksData = function() {
     // getTrendingStockTwitsTickers.then(function(symbols) {
 
@@ -113,28 +114,33 @@ app.controller('TrendsController', ['$scope', '$http', '$q', '$interval', functi
         getStocks(sendToPromise).then(function(data) {
           $scope.stocks = $scope.stocks.concat(formatStocks(data));
           console.log('Making Call');
+        //console.log($scope.stocks);
         });
+
       }
       getStocks(symbols).then(function(data) {
-        $scope.stocks = $scope.stocks.concat(formatStocks(data));
+        $scope.stocks = $scope.stocks.concat(formatStocks(data));        
+        $scope.stocks = $scope.stocks.sort(sortNumber);    
         console.log('Making Last Call');
       });
-
-      // console.log(symbols.length);
-
-    // });
   }
+
 
   // Upon pageload
   getTrendingStocksData();
 
   // 30 second intervals
-  $interval(function() {
+ /* $interval(function() {
     getTrendingStocksData();
-  }, 30000);
+  }, 30000);*/
 
 
   /* COMMON FUNCTIONS */
+
+  function sortNumber(a,b){
+   console.log(typeof a.changePercent);
+   return parseFloat(b.changePercent) - parseFloat(a.changePercent) ;
+  }
 
   $scope.isPositive = function(stock) {
     var index = stock.indexOf('+');
