@@ -129,9 +129,9 @@ app.controller('TrendsController', ['$scope', '$http', '$q', '$interval', functi
   getTrendingStocksData();
 
   // 30 second intervals
-  // $interval(function() {
-  //   getTrendingStocksData();
-  // }, 3000);
+  $interval(function() {
+    getTrendingStocksData();
+  }, 30000);
 
 
   /* COMMON FUNCTIONS */
