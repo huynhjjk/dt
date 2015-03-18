@@ -152,17 +152,17 @@ app.controller('TrendsController', ['$scope', '$http', '$q', '$interval', functi
 
 
   /* Get Manual Stocks */
-  $scope.symbols = ['UWTI', 'RTRX', 'FXCM', 'AAPL'];
+  // $scope.symbols = ['UWTI', 'RTRX', 'FXCM', 'AAPL'];
   $scope.searchSymbols = function() {
     getTrendingStocksData($scope.symbols);
   }
 
   /* Get Trending Stock Twits Stocks */
-  // getTrendingStockTwitsTickers().then(function(trendingStocks) {
-  //   $scope.trendingStocks = trendingStocks;
-  //   $scope.symbols = trendingStocks;
-  //   getTrendingStocksData($scope.symbols);
-  // });
+  getTrendingStockTwitsTickers().then(function(trendingStocks) {
+    $scope.trendingStocks = trendingStocks;
+    $scope.symbols = trendingStocks;
+    getTrendingStocksData($scope.symbols);
+  });
 
   /* Get All Stocks */
   // $scope.symbols = getAllSymbols();
