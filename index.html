@@ -10,8 +10,6 @@
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fullPage.js/2.5.9/jquery.fullPage.min.css">
 
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/nvd3/1.7.0/nv.d3.min.css">
-
     <link rel="stylesheet" href="css/custom-styles.css">
 
   </head>
@@ -40,7 +38,7 @@
       <div class="section" id="section1" ng-controller="TrendsController">
         <div class="container">
           <h1 class="text-center">Top Trending</h1>
-          <form ng-submit="searchSymbols()">
+<!--           <form ng-submit="searchSymbols()">
             <div class="input-group">
               <input type="text" class="form-control input-lg" ng-list ng-trim="true" ng-model="symbols" name="text" placeholder="Search for...">
               <span class="input-group-btn">
@@ -48,8 +46,8 @@
               </span>
             </div>
           </form>
-          <ol>
-            <li ng-repeat="stock in stocks | orderBy:'changePercent':true">
+ -->          <ol>
+            <li ng-repeat="stock in firebaseStocks | orderBy:'changePercent':true">
               <div class="symbol">
                 <span class="symbol-text">{{stock.symbol}}</span>
                 <span class="symbol-current">{{stock.current}}</span>
@@ -97,13 +95,17 @@
 
     <script src="js/customFullPage.js"></script>
 
-    <script src="js/all-stock-symbols-jan-2015"></script>
     <script src="js/app.js"></script>
     <script src="js/navigation-bar-controller.js"></script>
     <script src="js/trends-controller.js"></script>
 
     <!-- Sample Data -->
     <script src="sample/sample-tech-data.js"></script>
+
+    <!-- Firebase -->
+    <script src="https://cdn.firebase.com/js/client/2.2.2/firebase.js"></script>
+    <!-- AngularFire -->
+    <script src="https://cdn.firebase.com/libs/angularfire/1.0.0/angularfire.min.js"></script>
 
   </body>
 </html>
