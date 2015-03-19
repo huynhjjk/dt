@@ -27,6 +27,7 @@
            $scope.firebaseStocksRef = new Firebase("https://dt-app.firebaseio.com/").child("stocks");
            $scope.firebaseStocks = $firebaseArray($scope.firebaseStocksRef);
             $scope.removeFirebaseStocks = function() {
+              console.log('Removing Firebase Stocks');
               $scope.firebaseStocksRef.remove();           
             }
 
@@ -103,32 +104,33 @@
                 stock.current = parseFloat(googleFinanceStock.l) || 0;
                 stock.changePrice = parseFloat(googleFinanceStock.c) || 0;
                 stock.changePercent = parseFloat(googleFinanceStock.cp) || 0;
-                stock.lastPurchase = new Date(googleFinanceStock.lt_dts) || 0;
-                stock.dividend = parseFloat(googleFinanceStock.div) || 0;
-                if ($scope.trendingStocks) {
-                  stock.isTrending = ($scope.trendingStocks.indexOf(googleFinanceStock.t) != -1) ? true:false;
-                  stock.trendingRank = ($scope.trendingStocks.indexOf(googleFinanceStock.t) != -1) ? $scope.trendingStocks.indexOf(googleFinanceStock.t) + 1: 0;
-                }
+                stock.lastPurchase = googleFinanceStock.lt || 'N/A';
+                // stock.dividend = parseFloat(googleFinanceStock.div) || 0;
+                // if ($scope.trendingStocks) {
+                //   stock.isTrending = ($scope.trendingStocks.indexOf(googleFinanceStock.t) != -1) ? true:false;
+                //   stock.trendingRank = ($scope.trendingStocks.indexOf(googleFinanceStock.t) != -1) ? $scope.trendingStocks.indexOf(googleFinanceStock.t) + 1: 0;
+                // }
                 // Yahoo Finance
-                stock.name = yahooFinanceStock.Name || 0;
+                stock.name = yahooFinanceStock.Name || stock.symbol;
                 stock.averageDailyVolume = parseFloat(yahooFinanceStock.AverageDailyVolume) || 0;
                 stock.open = parseFloat(yahooFinanceStock.Open) || 0;
                 stock.close = parseFloat(yahooFinanceStock.PreviousClose) || 0;
                 stock.daysHigh = parseFloat(yahooFinanceStock.DaysHigh) || 0;
                 stock.daysLow = parseFloat(yahooFinanceStock.DaysLow) || 0;
-                stock.yearHigh = parseFloat(yahooFinanceStock.YearHigh) || 0;
-                stock.yearLow = parseFloat(yahooFinanceStock.YearLow) || 0;
-                stock.estimateCurrentYear = parseFloat(yahooFinanceStock.EPSEstimateCurrentYear) || 0;
-                stock.estimateNextQuarter = parseFloat(yahooFinanceStock.EPSEstimateNextQuarter) || 0;
-                stock.estimateNextYear = parseFloat(yahooFinanceStock.EPSEstimateNextYear) || 0;
-                stock.fiftyDayMovingAverage = parseFloat(yahooFinanceStock.FiftydayMovingAverage) || 0;
+                // stock.yearHigh = parseFloat(yahooFinanceStock.YearHigh) || 0;
+                // stock.yearLow = parseFloat(yahooFinanceStock.YearLow) || 0;
+                // stock.estimateCurrentYear = parseFloat(yahooFinanceStock.EPSEstimateCurrentYear) || 0;
+                // stock.estimateNextQuarter = parseFloat(yahooFinanceStock.EPSEstimateNextQuarter) || 0;
+                // stock.estimateNextYear = parseFloat(yahooFinanceStock.EPSEstimateNextYear) || 0;
+                // stock.fiftyDayMovingAverage = parseFloat(yahooFinanceStock.FiftydayMovingAverage) || 0;
 
+                stock.lastModified = new Date();
                 return stock;
             }
 
             var getAllStocks = function(symbols) {
                 var promises = [];
-                var symbolsPerCall = 116;
+                var symbolsPerCall = 100;
                 var originalSymbolSize = angular.copy(symbols.length);      
                 var iterate = Math.floor(originalSymbolSize / symbolsPerCall);
                 for (var i = 0; i < iterate; i++) {
@@ -144,8 +146,11 @@
 
             $scope.firebaseStocks.$loaded()
               .then(function(firebaseStocks) {
+                // Testing: Always remove stocks on page load
+                $scope.removeFirebaseStocks();
                 if (firebaseStocks.length === 0) {
                   console.log('Firebase is empty. Get all stocks.');
+
                   var symbols = getAllStaticSymbols();
                   getAllStocks(symbols).then(function(data) {
                     for (var i = 0; i < data.length; i++) {
@@ -160,27 +165,30 @@
                 } else {
                   console.log('Firebase has data. Retrieve existing stocks.');
                   var lookup = {};
-                  for (var i = 0, len = firebaseStocks.length; i < len; i++) {
-                      lookup[firebaseStocks[i].symbol] = firebaseStocks[i];
+                  for (var a = 0, len = firebaseStocks.length; a < len; a++) {
+                      lookup[firebaseStocks[a].symbol] = firebaseStocks[a];
                   }
+                  console.log(lookup);
                   var symbols = [];
-                  for (var i = 0; i < firebaseStocks.length; i++) {
-                    symbols.push(firebaseStocks[i].symbol);
+                  for (var b = 0; b < firebaseStocks.length; b++) {
+                    symbols.push(firebaseStocks[b].symbol);
                   }
                   $interval(function() {
-                    console.log('Updating after 20 seconds');
+                    console.log('Updating...');
                     getAllStocks(symbols).then(function(data) {
                       for (var i = 0; i < data.length; i++) {
                         var googleFinanceStocks = JSON.parse(data[i][0].data.substring(3, data[i][0].data.length));
                         var yahooFinanceStocks = data[i][1].data.query.results.quote;
                         for (var j = 0; j < googleFinanceStocks.length; j++) {
                           var stock = formatStock(googleFinanceStocks[j], yahooFinanceStocks[j]);
-                          var keyRef = new Firebase("https://dt-app.firebaseio.com/").child("stocks").child(lookup[stock.symbol].$id);
-                          keyRef.update(stock);
+                          if (lookup[stock.symbol]) {
+                            var keyRef = new Firebase("https://dt-app.firebaseio.com/").child("stocks").child(lookup[stock.symbol].$id);
+                            keyRef.update(stock);
+                          }
                         }
                       }
                     });
-                  }, 20000);
+                  }, 30000);
                 }
               })
               .catch(function(error) {
