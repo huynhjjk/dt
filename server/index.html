@@ -122,7 +122,7 @@
                 // stock.estimateCurrentYear = parseFloat(yahooFinanceStock.EPSEstimateCurrentYear) || 0;
                 // stock.estimateNextQuarter = parseFloat(yahooFinanceStock.EPSEstimateNextQuarter) || 0;
                 // stock.estimateNextYear = parseFloat(yahooFinanceStock.EPSEstimateNextYear) || 0;
-                // stock.fiftyDayMovingAverage = parseFloat(yahooFinanceStock.FiftydayMovingAverage) || 0;
+                stock.fiftyDayMovingAverage = parseFloat(yahooFinanceStock.FiftydayMovingAverage) || 0;
 
                 stock.lastModified = new Date();
                 return stock;
@@ -147,7 +147,7 @@
             $scope.firebaseStocks.$loaded()
               .then(function(firebaseStocks) {
                 // Testing: Always remove stocks on page load
-                $scope.removeFirebaseStocks();
+                // $scope.removeFirebaseStocks();
                 if (firebaseStocks.length === 0) {
                   console.log('Firebase is empty. Get all stocks.');
 
@@ -188,7 +188,7 @@
                         }
                       }
                     });
-                  }, 30000);
+                  }, 20000);
                 }
               })
               .catch(function(error) {
