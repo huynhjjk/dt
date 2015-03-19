@@ -78,7 +78,7 @@
             }
 
             // Google and Yahoo Finance Stock Mash Up
-            var getStocks = function(symbols){
+            var getGoogleYahooFinanceData = function(symbols){
 
                 var googleFinanceUrl = 'http://finance.google.com/finance/info?client=ig&q=' + symbols.join();
                 var yahooFinanceUrl = 'https://query.yahooapis.com/v1/public/yql?q=select%20*%20from%20yahoo.finance.quotes%20where%20symbol%20in%20(%27' + symbols.join() + '%27)%0A%09%09&format=json&env=http%3A%2F%2Fdatatables.org%2Falltables.env&callback=';
@@ -96,115 +96,96 @@
                 return $q.all(promises);
             }
 
-            var addStocksToFirebase = function(data) {
-              var googleFinanceStocks = JSON.parse(data[0].data.substring(3, data[0].data.length));
-              var yahooFinanceStocks = data[1].data.query.results.quote;
-              for (var j = 0; j < googleFinanceStocks.length; j++) {
+            var formatStock = function(googleFinanceStock, yahooFinanceStock) {
                 var stock = {};
                 // Google Finance
-                stock.symbol = googleFinanceStocks[j].t || 0;
-                stock.current = parseFloat(googleFinanceStocks[j].l) || 0;
-                stock.changePrice = parseFloat(googleFinanceStocks[j].c) || 0;
-                stock.changePercent = parseFloat(googleFinanceStocks[j].cp) || 0;
-                stock.lastPurchase = new Date(googleFinanceStocks[j].lt_dts) || 0;
-                stock.dividend = parseFloat(googleFinanceStocks[j].div) || 0;
+                stock.symbol = googleFinanceStock.t || 0;
+                stock.current = parseFloat(googleFinanceStock.l) || 0;
+                stock.changePrice = parseFloat(googleFinanceStock.c) || 0;
+                stock.changePercent = parseFloat(googleFinanceStock.cp) || 0;
+                stock.lastPurchase = new Date(googleFinanceStock.lt_dts) || 0;
+                stock.dividend = parseFloat(googleFinanceStock.div) || 0;
                 if ($scope.trendingStocks) {
-                  stock.isTrending = ($scope.trendingStocks.indexOf(googleFinanceStocks[j].t) != -1) ? true:false;
-                  stock.trendingRank = ($scope.trendingStocks.indexOf(googleFinanceStocks[j].t) != -1) ? $scope.trendingStocks.indexOf(googleFinanceStocks[j].t) + 1: 0;
+                  stock.isTrending = ($scope.trendingStocks.indexOf(googleFinanceStock.t) != -1) ? true:false;
+                  stock.trendingRank = ($scope.trendingStocks.indexOf(googleFinanceStock.t) != -1) ? $scope.trendingStocks.indexOf(googleFinanceStock.t) + 1: 0;
                 }
                 // Yahoo Finance
-                stock.name = yahooFinanceStocks[j].Name || 0;
-                stock.averageDailyVolume = parseFloat(yahooFinanceStocks[j].AverageDailyVolume) || 0;
-                stock.open = parseFloat(yahooFinanceStocks[j].Open) || 0;
-                stock.close = parseFloat(yahooFinanceStocks[j].PreviousClose) || 0;
-                stock.daysHigh = parseFloat(yahooFinanceStocks[j].DaysHigh) || 0;
-                stock.daysLow = parseFloat(yahooFinanceStocks[j].DaysLow) || 0;
-                stock.yearHigh = parseFloat(yahooFinanceStocks[j].YearHigh) || 0;
-                stock.yearLow = parseFloat(yahooFinanceStocks[j].YearLow) || 0;
-                stock.estimateCurrentYear = parseFloat(yahooFinanceStocks[j].EPSEstimateCurrentYear) || 0;
-                stock.estimateNextQuarter = parseFloat(yahooFinanceStocks[j].EPSEstimateNextQuarter) || 0;
-                stock.estimateNextYear = parseFloat(yahooFinanceStocks[j].EPSEstimateNextYear) || 0;
-                stock.fiftyDayMovingAverage = parseFloat(yahooFinanceStocks[j].FiftydayMovingAverage) || 0;
+                stock.name = yahooFinanceStock.Name || 0;
+                stock.averageDailyVolume = parseFloat(yahooFinanceStock.AverageDailyVolume) || 0;
+                stock.open = parseFloat(yahooFinanceStock.Open) || 0;
+                stock.close = parseFloat(yahooFinanceStock.PreviousClose) || 0;
+                stock.daysHigh = parseFloat(yahooFinanceStock.DaysHigh) || 0;
+                stock.daysLow = parseFloat(yahooFinanceStock.DaysLow) || 0;
+                stock.yearHigh = parseFloat(yahooFinanceStock.YearHigh) || 0;
+                stock.yearLow = parseFloat(yahooFinanceStock.YearLow) || 0;
+                stock.estimateCurrentYear = parseFloat(yahooFinanceStock.EPSEstimateCurrentYear) || 0;
+                stock.estimateNextQuarter = parseFloat(yahooFinanceStock.EPSEstimateNextQuarter) || 0;
+                stock.estimateNextYear = parseFloat(yahooFinanceStock.EPSEstimateNextYear) || 0;
+                stock.fiftyDayMovingAverage = parseFloat(yahooFinanceStock.FiftydayMovingAverage) || 0;
 
-                $scope.firebaseStocks.$add(stock);
-              }
+                return stock;
             }
 
-            var getTrendingStocksData = function(symbols) {
+            var getAllStocks = function(symbols) {
+                var promises = [];
                 var symbolsPerCall = 116;
                 var originalSymbolSize = angular.copy(symbols.length);      
                 var iterate = Math.floor(originalSymbolSize / symbolsPerCall);
-
                 for (var i = 0; i < iterate; i++) {
                   var sendToPromise = symbols.splice(0, symbolsPerCall);
-                  getStocks(sendToPromise).then(function(data) {
-                    addStocksToFirebase(data);
-                  });
-                  console.log('Making Call');
+                  promises.push(getGoogleYahooFinanceData(sendToPromise));
                 }
-                getStocks(symbols).then(function(data) {
-                  addStocksToFirebase(data);
-                  console.log('Making Last Call');
-                });
+                promises.push(getGoogleYahooFinanceData(symbols));
+
+                return $q.all(promises);
             }
 
-            /* Get Trending Stock Twits Stocks */
-            // getTrendingStockTwitsTickers().then(function(trendingStocks) {
-            //   $scope.trendingStocks = trendingStocks;
-            //   $scope.symbols = trendingStocks;
-            //   getTrendingStocksData($scope.symbols);
-            // });
-
             /* Get All Stocks */
-            // var symbols = getAllStaticSymbols();
-            // getTrendingStocksData(symbols);
 
-            // $scope.firebaseStocks.$loaded()
-            //   .then(function(data) {
-            //     // var symbols = [];
-            //     // for (var i = 0; i < data.length; i++) {
-            //     //   symbols.push(data[i].symbol);
-            //     // }
-            //     // var newStocksData = ?
-            //     // for (var i = 0; i < newStocksData.length; j++) {
-            //     //   $scope.firebaseStocks.update(newStocksData[i]);
-            //     // }
-
-            //     console.log($scope.firebaseStocks[0]);
-            //     var keyReference = new Firebase("https://dt-app.firebaseio.com/").child("stocks").child("-JkkWWcJ02T4iNtHvC-E");
-            //     //for each symbol object in new data
-            //     //for each symbol in old data
-            //     //compare matching old and new data
-            //     //if both are the same company, then update()
-            //     //switch case for each key to see which ones stay the same
-
-              
-            //     console.log(keyReference.update({ averageDailyVolume: 999}));
-            //     // $scope.firebaseStocks.$save(i);                               
-            //     console.log(data);
-            //   })
-            //   .catch(function(error) {
-            //     console.error("Error:", error);
-            //   });
-
-            /* 20 Second Intervals */
-            // $scope.firebaseStocks.$loaded()
-            //   .then(function(data) {
-                // var symbols = [];
-                // for (var i = 0; i < data.length; i++) {
-                //   symbols.push(data[i].symbol);
-                // }                
-                // for (var j = 0; j < data.length; j++) {                                    
-                // }
-                // $interval(function() {
-                //   $scope.firebaseStocks
-                //   getTrendingStocksData($scope.symbols);
-                //   console.log('running');
-                // }, 25000);
-              // })
-              // .catch(function(error) {
-              //   console.error("Error:", error);
-              // });
+            $scope.firebaseStocks.$loaded()
+              .then(function(firebaseStocks) {
+                if (firebaseStocks.length === 0) {
+                  console.log('Firebase is empty. Get all stocks.');
+                  var symbols = getAllStaticSymbols();
+                  getAllStocks(symbols).then(function(data) {
+                    for (var i = 0; i < data.length; i++) {
+                      var googleFinanceStocks = JSON.parse(data[i][0].data.substring(3, data[i][0].data.length));
+                      var yahooFinanceStocks = data[i][1].data.query.results.quote;
+                      for (var j = 0; j < googleFinanceStocks.length; j++) {
+                        var stock = formatStock(googleFinanceStocks[j], yahooFinanceStocks[j]);
+                        $scope.firebaseStocks.$add(stock);                                    
+                      }
+                    }
+                  });
+                } else {
+                  console.log('Firebase has data. Retrieve existing stocks.');
+                  var lookup = {};
+                  for (var i = 0, len = firebaseStocks.length; i < len; i++) {
+                      lookup[firebaseStocks[i].symbol] = firebaseStocks[i];
+                  }
+                  var symbols = [];
+                  for (var i = 0; i < firebaseStocks.length; i++) {
+                    symbols.push(firebaseStocks[i].symbol);
+                  }
+                  $interval(function() {
+                    console.log('Updating after 20 seconds');
+                    getAllStocks(symbols).then(function(data) {
+                      for (var i = 0; i < data.length; i++) {
+                        var googleFinanceStocks = JSON.parse(data[i][0].data.substring(3, data[i][0].data.length));
+                        var yahooFinanceStocks = data[i][1].data.query.results.quote;
+                        for (var j = 0; j < googleFinanceStocks.length; j++) {
+                          var stock = formatStock(googleFinanceStocks[j], yahooFinanceStocks[j]);
+                          var keyRef = new Firebase("https://dt-app.firebaseio.com/").child("stocks").child(lookup[stock.symbol].$id);
+                          keyRef.update(stock);
+                        }
+                      }
+                    });
+                  }, 20000);
+                }
+              })
+              .catch(function(error) {
+                console.error("Error:", error);
+              });
 
       }]);
     </script>
