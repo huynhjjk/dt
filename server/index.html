@@ -146,8 +146,6 @@
 
             $scope.firebaseStocks.$loaded()
               .then(function(firebaseStocks) {
-                // Testing: Always remove stocks on page load
-                // $scope.removeFirebaseStocks();
                 if (firebaseStocks.length === 0) {
                   console.log('Firebase is empty. Get all stocks.');
 
@@ -173,7 +171,7 @@
                   for (var b = 0; b < firebaseStocks.length; b++) {
                     symbols.push(firebaseStocks[b].symbol);
                   }
-                  $interval(function() {
+                  // $interval(function() {
                     console.log('Updating...');
                     getAllStocks(symbols).then(function(data) {
                       for (var i = 0; i < data.length; i++) {
@@ -188,7 +186,11 @@
                         }
                       }
                     });
+<<<<<<< HEAD
                   }, 20000);
+=======
+                  // }, 30000);
+>>>>>>> johnson
                 }
               })
               .catch(function(error) {
