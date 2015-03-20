@@ -47,7 +47,6 @@
             </div>
           </form>
  -->          <ol>
-            <pre>{{firebaseStocks | json}}</pre>
             <li ng-repeat="stock in firebaseStocks | orderBy:'changePercent':true">
               <div class="symbol">
                 <span class="symbol-text">{{stock.symbol}}</span>
