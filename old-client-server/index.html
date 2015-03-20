@@ -146,6 +146,7 @@
 
             $scope.firebaseStocks.$loaded()
               .then(function(firebaseStocks) {
+                
                 if (firebaseStocks.length === 0) {
                   console.log('Firebase is empty. Get all stocks.');
 
