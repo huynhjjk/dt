@@ -58,20 +58,20 @@
                 <span ng-class="{'symbol-green' : isPositive(stock.changePrice), 'symbol-red' : !isPositive(stock.changePrice)}">{{stock.changePrice}} ({{stock.changePercent}}%)             
                 </span>
                 <span class="glyphicon glyphicon-eye-open" ng-if="stock.isTrending"></span>
-                <span class="pull-right"><i>Last Updated: {{stock.lastUpdate | date: 'medium'}}</i></span>
               </div>
               <div class="row">
                 <div class="col-xs-12 col-md-6">
                   <p><i>{{stock.name}}</i></p>
-                  <p>Average Daily Volume: {{stock.averageDailyVolume}}</p>
-                  <p>Open: {{stock.open}}</p>
-                  <p>Close: {{stock.close}}</p>
+                  <p>Open: {{stock.open}} | Close: {{stock.close}}</p>
+                  <p>Day Range: {{stock.dayRange}}</p>
+                  <p>Year Range: {{stock.yearRange}}</p>
                 </div>
                 <div class="col-xs-12 col-md-6">
                   <p>Last Purchase: {{stock.lastPurchase}}</p>
+                  <p>Last Updated: {{stock.lastUpdate | date: 'medium'}}</p>
+                  <p>Average Daily Volume: {{stock.averageDailyVolume}}</p>
                   <p>Fifty Day Moving Average: {{stock.fiftyDayMovingAverage}}</p>
-                  <p>High: {{stock.daysHigh}}</p>
-                  <p>Low: {{stock.daysLow}}</p>
+                  <p>Two Hundred Day Moving Average: {{stock.twoHundredDayMovingAverage}}</p>
                 </div>
               </div>
             </li>

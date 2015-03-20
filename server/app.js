@@ -113,14 +113,17 @@ var server = app.listen(3000, 'localhost', function () {
 					if (yahooFinance[i].PreviousClose) {
 						stock.close = parseFloat(yahooFinance[i].PreviousClose);						
 					}
-					if (yahooFinance[i].DaysHigh) {
-						stock.daysHigh = parseFloat(yahooFinance[i].DaysHigh);						
+					if (yahooFinance[i].DaysRange) {
+						stock.dayRange = yahooFinance[i].DaysRange;						
 					}
-					if (yahooFinance[i].DaysLow) {
-						stock.daysLow = parseFloat(yahooFinance[i].DaysLow);
+					if (yahooFinance[i].YearRange) {
+						stock.yearRange = yahooFinance[i].YearRange;						
 					}
 					if (yahooFinance[i].FiftydayMovingAverage) {
 						stock.fiftyDayMovingAverage = parseFloat(yahooFinance[i].FiftydayMovingAverage);
+					}
+					if (yahooFinance[i].TwoHundreddayMovingAverage) {
+						stock.twoHundredDayMovingAverage = parseFloat(yahooFinance[i].TwoHundreddayMovingAverage);
 					}
 					// Custom
 					stock.lastUpdate = (new Date()).getTime();
