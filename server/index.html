@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en" ng-app="DT-SERVER">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>DT-SERVER</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css">
+  </head>
+  <body ng-controller="ServerController">
+    <div class="container">
+      <button class="btn btn-primary btn-lg" ng-click="removeFirebaseStocks()">Remove</button>
+      <pre>
+        {{firebaseStocks.length}} Results
+        {{firebaseStocks | json}}
+      </pre>
+    </div>
+    <script src="all-stock-symbols-jan-2015"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/js/bootstrap.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.3.14/angular.min.js"></script>
+    <script src="https://cdn.firebase.com/js/client/2.2.2/firebase.js"></script>
+    <script src="https://cdn.firebase.com/libs/angularfire/1.0.0/angularfire.min.js"></script>
+    <script>
+      var app = angular.module('DT-SERVER', ['firebase']);
+      app.controller('ServerController', ['$scope', '$http', '$q', '$interval', '$firebaseArray', function($scope, $http, $q, $interval, $firebaseArray) { 
+           $scope.firebaseStocksRef = new Firebase("https://dt-app.firebaseio.com/").child("stocks");
+           $scope.firebaseStocks = $firebaseArray($scope.firebaseStocksRef);
+            $scope.removeFirebaseStocks = function() {
+              console.log('Removing Firebase Stocks');
+              $scope.firebaseStocksRef.remove();           
+            }
+
+          // Site domain: localhost
+          // Consumer key: e3607fbbbc59dabc
+          // Consumer secret: 082e6fc86fb4e39c40797539613f5f2ceac0ece5
+          // Request token URL: https://api.stocktwits.com/api/2/oauth/token
+          // Authorize URL: https://api.stocktwits.com/api/2/oauth/authorize
+          // DeAuthorization URL: None
+          // Use link below to get token
+          // https://api.stocktwits.com/api/2/oauth/authorize?client_id=e3607fbbbc59dabc&response_type=token&redirect_uri=http://localhost:8888/dt/#trends&scope=read,watch_lists,publish_messages,publish_watch_lists,follow_users,follow_stocks
+
+            var tokens = {
+              stockTwits: 'f7df9f117b9aaf79bd77d126ac4d443df93a2846'
+            }
+
+            // StockTwits Trending Tickers
+            var getTrendingStockTwitsTickers = function() {
+              return $q(function(resolve, reject) {
+                //https://api.stocktwits.com/api/2/trending/symbols.json?access_token=f7df9f117b9aaf79bd77d126ac4d443df93a2846
+                var config = {
+                    url: 'https://api.stocktwits.com/api/2/trending/symbols.json',
+                    method: 'GET',
+                    params: {
+                        access_token: tokens.stockTwits
+                    }
+                };
+                $http(config).
+                  success(function(data, status, headers, config) {
+                    var symbols = [];
+                    for (var i = 0; i < data.symbols.length; i++) {
+                      symbols.push(data.symbols[i].symbol);
+                    }
+                    resolve(symbols);
+                  }).
+                  error(function(data, status, headers, config) {
+                    alert('Error', status);
+                    console.log(data);
+                  });
+              });
+            }
+
+            var getAllStaticSymbols = function() {
+              var symbols = [];
+              for (var i = 0; i < allSymbols.length; i++) {
+                symbols.push(allSymbols[i].Symbol);
+              }
+              return symbols;
+            }
+
+            // Google and Yahoo Finance Stock Mash Up
+            var getGoogleYahooFinanceData = function(symbols){
+
+                var googleFinanceUrl = 'http://finance.google.com/finance/info?client=ig&q=' + symbols.join();
+                var yahooFinanceUrl = 'https://query.yahooapis.com/v1/public/yql?q=select%20*%20from%20yahoo.finance.quotes%20where%20symbol%20in%20(%27' + symbols.join() + '%27)%0A%09%09&format=json&env=http%3A%2F%2Fdatatables.org%2Falltables.env&callback=';
+
+                var urls = [];
+                urls.push(googleFinanceUrl);
+                urls.push(yahooFinanceUrl);
+
+                var promises = [];
+
+                for (var i = 0; i < urls.length; i++) {
+                  promises.push($http.get(urls[i]));
+                }
+
+                return $q.all(promises);
+            }
+
+            var formatStock = function(googleFinanceStock, yahooFinanceStock) {
+                var stock = {};
+                // Google Finance
+                stock.symbol = googleFinanceStock.t || 0;
+                stock.current = parseFloat(googleFinanceStock.l) || 0;
+                stock.changePrice = parseFloat(googleFinanceStock.c) || 0;
+                stock.changePercent = parseFloat(googleFinanceStock.cp) || 0;
+                stock.lastPurchase = googleFinanceStock.lt || 'N/A';
+                // stock.dividend = parseFloat(googleFinanceStock.div) || 0;
+                // if ($scope.trendingStocks) {
+                //   stock.isTrending = ($scope.trendingStocks.indexOf(googleFinanceStock.t) != -1) ? true:false;
+                //   stock.trendingRank = ($scope.trendingStocks.indexOf(googleFinanceStock.t) != -1) ? $scope.trendingStocks.indexOf(googleFinanceStock.t) + 1: 0;
+                // }
+                // Yahoo Finance
+                stock.name = yahooFinanceStock.Name || stock.symbol;
+                stock.averageDailyVolume = parseFloat(yahooFinanceStock.AverageDailyVolume) || 0;
+                stock.open = parseFloat(yahooFinanceStock.Open) || 0;
+                stock.close = parseFloat(yahooFinanceStock.PreviousClose) || 0;
+                stock.daysHigh = parseFloat(yahooFinanceStock.DaysHigh) || 0;
+                stock.daysLow = parseFloat(yahooFinanceStock.DaysLow) || 0;
+                // stock.yearHigh = parseFloat(yahooFinanceStock.YearHigh) || 0;
+                // stock.yearLow = parseFloat(yahooFinanceStock.YearLow) || 0;
+                // stock.estimateCurrentYear = parseFloat(yahooFinanceStock.EPSEstimateCurrentYear) || 0;
+                // stock.estimateNextQuarter = parseFloat(yahooFinanceStock.EPSEstimateNextQuarter) || 0;
+                // stock.estimateNextYear = parseFloat(yahooFinanceStock.EPSEstimateNextYear) || 0;
+                stock.fiftyDayMovingAverage = parseFloat(yahooFinanceStock.FiftydayMovingAverage) || 0;
+
+                stock.lastModified = new Date();
+                return stock;
+            }
+
+            var getAllStocks = function(symbols) {
+                var promises = [];
+                var symbolsPerCall = 100;
+                var originalSymbolSize = angular.copy(symbols.length);      
+                var iterate = Math.floor(originalSymbolSize / symbolsPerCall);
+                for (var i = 0; i < iterate; i++) {
+                  var sendToPromise = symbols.splice(0, symbolsPerCall);
+                  promises.push(getGoogleYahooFinanceData(sendToPromise));
+                }
+                promises.push(getGoogleYahooFinanceData(symbols));
+
+                return $q.all(promises);
+            }
+
+            /* Get All Stocks */
+
+            $scope.firebaseStocks.$loaded()
+              .then(function(firebaseStocks) {
+                if (firebaseStocks.length === 0) {
+                  console.log('Firebase is empty. Get all stocks.');
+
+                  var symbols = getAllStaticSymbols();
+                  getAllStocks(symbols).then(function(data) {
+                    for (var i = 0; i < data.length; i++) {
+                      var googleFinanceStocks = JSON.parse(data[i][0].data.substring(3, data[i][0].data.length));
+                      var yahooFinanceStocks = data[i][1].data.query.results.quote;
+                      for (var j = 0; j < googleFinanceStocks.length; j++) {
+                        var stock = formatStock(googleFinanceStocks[j], yahooFinanceStocks[j]);
+                        $scope.firebaseStocks.$add(stock);                                    
+                      }
+                    }
+                  });
+                } else {
+                  console.log('Firebase has data. Retrieve existing stocks.');
+                  var lookup = {};
+                  for (var a = 0, len = firebaseStocks.length; a < len; a++) {
+                      lookup[firebaseStocks[a].symbol] = firebaseStocks[a];
+                  }
+                  console.log(lookup);
+                  var symbols = [];
+                  for (var b = 0; b < firebaseStocks.length; b++) {
+                    symbols.push(firebaseStocks[b].symbol);
+                  }
+                  // $interval(function() {
+                    console.log('Updating...');
+                    getAllStocks(symbols).then(function(data) {
+                      for (var i = 0; i < data.length; i++) {
+                        var googleFinanceStocks = JSON.parse(data[i][0].data.substring(3, data[i][0].data.length));
+                        var yahooFinanceStocks = data[i][1].data.query.results.quote;
+                        for (var j = 0; j < googleFinanceStocks.length; j++) {
+                          var stock = formatStock(googleFinanceStocks[j], yahooFinanceStocks[j]);
+                          if (lookup[stock.symbol]) {
+                            var keyRef = new Firebase("https://dt-app.firebaseio.com/").child("stocks").child(lookup[stock.symbol].$id);
+                            keyRef.update(stock);
+                          }
+                        }
+                      }
+                    });
+                  // }, 30000);
+                }
+              })
+              .catch(function(error) {
+                console.error("Error:", error);
+              });
+
+      }]);
+    </script>
+  </body>
+</html>
