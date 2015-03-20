@@ -125,6 +125,16 @@ var server = app.listen(3000, 'localhost', function () {
 					if (yahooFinance[i].TwoHundreddayMovingAverage) {
 						stock.twoHundredDayMovingAverage = parseFloat(yahooFinance[i].TwoHundreddayMovingAverage);
 					}
+					if (yahooFinance[i].DividendYield) {
+						stock.dividendYield = parseFloat(yahooFinance[i].DividendYield);
+					} else {
+						stock.dividendYield = 'N/A';
+					}
+					if (yahooFinance[i].DividendPayDate) {
+						stock.dividendPayDate = yahooFinance[i].DividendPayDate;
+					} else {
+						stock.dividendPayDate = 'N/A';
+					}
 					// Custom
 					stock.lastUpdate = (new Date()).getTime();
 					stocks.push(stock);
