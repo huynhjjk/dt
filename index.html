@@ -47,7 +47,6 @@
             </div>
           </form>
  -->          <ol>
-            <pre>{{firebaseStocks | json}}</pre>
             <li ng-repeat="stock in firebaseStocks | orderBy:'changePercent':true">
               <div class="symbol">
                 <span class="symbol-text">{{stock.symbol}}</span>
@@ -58,22 +57,23 @@
 
                 <span ng-class="{'symbol-green' : isPositive(stock.changePrice), 'symbol-red' : !isPositive(stock.changePrice)}">{{stock.changePrice}} ({{stock.changePercent}}%)             
                 </span>
-
                 <span class="glyphicon glyphicon-eye-open" ng-if="stock.isTrending"></span>
-                
               </div>
               <div class="row">
                 <div class="col-xs-12 col-md-6">
                   <p><i>{{stock.name}}</i></p>
-                  <p>Average Daily Volume: {{stock.averageDailyVolume}}</p>
-                  <p>Open: {{stock.open}}</p>
-                  <p>Close: {{stock.close}}</p>
+                  <p>Open: {{stock.open}} | Close: {{stock.close}}</p>
+                  <p>Day Range: {{stock.dayRange}}</p>
+                  <p>Year Range: {{stock.yearRange}}</p>
+                  <p>Dividend Yield: {{stock.dividendYield}}</p>
+                  <p>Dividend Pay Date: {{stock.dividendPayDate}}</p>
                 </div>
                 <div class="col-xs-12 col-md-6">
                   <p>Last Purchase: {{stock.lastPurchase}}</p>
+                  <p>Last Updated: {{stock.lastUpdate | date: 'medium'}}</p>
+                  <p>Average Daily Volume: {{stock.averageDailyVolume}}</p>
                   <p>Fifty Day Moving Average: {{stock.fiftyDayMovingAverage}}</p>
-                  <p>High: {{stock.daysHigh}}</p>
-                  <p>Low: {{stock.daysLow}}</p>
+                  <p>Two Hundred Day Moving Average: {{stock.twoHundredDayMovingAverage}}</p>
                 </div>
               </div>
             </li>

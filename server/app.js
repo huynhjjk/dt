@@ -20,7 +20,8 @@ var server = app.listen(3000, 'localhost', function () {
 	var originalSymbolsRef = rootRef.child('symbols')
 	var currentSymbolsRef = rootRef.child('currentSymbols')
 
-	// stocksRef.remove();
+	stocksRef.remove();
+	currentSymbolsRef.remove();
 
 	//set all symbols to database
 	// for(var i = 0; i < symbols.length; i++){
@@ -93,8 +94,8 @@ var server = app.listen(3000, 'localhost', function () {
 					} else {
 						stock.changePercent = 0;
 					}
-					if (googleFinance[j].lt_dts) {
-						stock.lastPurchase = new Date(googleFinance[j].lt_dts);
+					if (googleFinance[j].lt) {
+						stock.lastPurchase = googleFinance[j].lt;
 					}
 					if (googleFinance[j].div) {
 						stock.div = parseFloat(googleFinance[j].div);
@@ -112,15 +113,30 @@ var server = app.listen(3000, 'localhost', function () {
 					if (yahooFinance[i].PreviousClose) {
 						stock.close = parseFloat(yahooFinance[i].PreviousClose);						
 					}
-					if (yahooFinance[i].DaysHigh) {
-						stock.daysHigh = parseFloat(yahooFinance[i].DaysHigh);						
+					if (yahooFinance[i].DaysRange) {
+						stock.dayRange = yahooFinance[i].DaysRange;						
 					}
-					if (yahooFinance[i].DaysLow) {
-						stock.daysLow = parseFloat(yahooFinance[i].DaysLow);
+					if (yahooFinance[i].YearRange) {
+						stock.yearRange = yahooFinance[i].YearRange;						
 					}
-					if (yahooFinance[i].fiftyDayMovingAverage) {
+					if (yahooFinance[i].FiftydayMovingAverage) {
 						stock.fiftyDayMovingAverage = parseFloat(yahooFinance[i].FiftydayMovingAverage);
 					}
+					if (yahooFinance[i].TwoHundreddayMovingAverage) {
+						stock.twoHundredDayMovingAverage = parseFloat(yahooFinance[i].TwoHundreddayMovingAverage);
+					}
+					if (yahooFinance[i].DividendYield) {
+						stock.dividendYield = parseFloat(yahooFinance[i].DividendYield);
+					} else {
+						stock.dividendYield = 'N/A';
+					}
+					if (yahooFinance[i].DividendPayDate) {
+						stock.dividendPayDate = yahooFinance[i].DividendPayDate;
+					} else {
+						stock.dividendPayDate = 'N/A';
+					}
+					// Custom
+					stock.lastUpdate = (new Date()).getTime();
 					stocks.push(stock);
 	    		}
 	    	}
@@ -189,7 +205,7 @@ var server = app.listen(3000, 'localhost', function () {
         } else {
         	console.log('Current Symbols already exist. Using existing symbols.');
 			/* Initialize using current symbols */
-			var seconds = 10, timeInterval = seconds * 1000;
+			var seconds = 30, timeInterval = seconds * 1000;
 			setInterval(function() {
 				console.log(seconds + " seconds have passed. Updating...");
 
