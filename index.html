@@ -57,9 +57,8 @@
 
                 <span ng-class="{'symbol-green' : isPositive(stock.changePrice), 'symbol-red' : !isPositive(stock.changePrice)}">{{stock.changePrice}} ({{stock.changePercent}}%)             
                 </span>
-
                 <span class="glyphicon glyphicon-eye-open" ng-if="stock.isTrending"></span>
-                
+                {{stock.lastUpdate | date: 'medium'}}                
               </div>
               <div class="row">
                 <div class="col-xs-12 col-md-6">
