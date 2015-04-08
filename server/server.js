@@ -22,7 +22,7 @@ var server = app.listen(3000, 'localhost', function () {
 
 	var reutersNewsRequest = function(searchQuery){
 		var deferred = Q.defer();
-		var url = 'http://www.reuters.com/search/news?blob=' + searchQuery + '&sortBy=relevance&dateRange=pastDay'
+		var url = 'http://www.reuters.com/search/news?blob=' + searchQuery + '&sortBy=date&dateRange=pastDay'
 		request(url, function (error, response, body) {
 		  if (!error && response.statusCode == 200) {
 		    var $ = cheerio.load(body);
@@ -32,7 +32,8 @@ var server = app.listen(3000, 'localhost', function () {
 		      	title: $(this).children().children().eq(0).text(),
 		      	url: $(this).children().children().attr('href'),
 		      	summary: $(this).children().next().eq(0).text(),      	
-		      	date: $(this).children().next().eq(1).text()
+		      	date: $(this).children().next().eq(1).text(),
+		      	source: 'reuters'
 		      }
 		      articles.push(article);
 		    });
@@ -50,7 +51,6 @@ var server = app.listen(3000, 'localhost', function () {
 		}
 		console.log('Sent to Firebase');
 	}
-
 
 	// Reuters Crude Oil News
 	reutersNewsRequest('crude oil').then(function(data){
