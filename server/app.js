@@ -20,6 +20,7 @@ var server = app.listen(3000, 'localhost', function () {
 	var originalSymbolsRef = rootRef.child('symbols')
 	var currentSymbolsRef = rootRef.child('currentSymbols')
 
+	stocksRef.remove();
 	currentSymbolsRef.remove();
 
 	//set all symbols to database
