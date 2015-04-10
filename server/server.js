@@ -49,7 +49,8 @@ var server = app.listen(3000, 'localhost', function () {
 		    	url: url,
 		    	title: $('h1.headline').text(),
 		    	date: $('#node_article_full_group_content > time').text(),
-		    	summary: $('#node_article_full_group_content').children().next().next().text()
+		    	summary: $('#node_article_full_group_content').children().next().next().text() + ' ',
+		    	source: 'Business Times'
 		    }
 			deferred.resolve(data);
 		  }
@@ -97,7 +98,8 @@ var server = app.listen(3000, 'localhost', function () {
 		    	url: url,
 		    	title: $('h1.article-headline').text(),
 		    	date: $('span.timestamp').text(),
-		    	summary: $('#articleText').children().text()
+		    	summary: $('#articleText').children().text() + ' ',
+		    	source: 'Reuters'
 		    }
 			deferred.resolve(data);
 		  }
