@@ -39,23 +39,31 @@
         <div class="container">
 
           <h1 class="text-center">Crude Oil News</h1>
-          <ul>
-            <li ng-repeat="article in firebaseNews">
-              <h3><a href="{{article.url}}" target="_blank">{{article.title}}</a></h3>
-              <b>{{article.date}}</b>
-              <p>{{article.summary}}</p>
-            </li>
-          </ul>
-          <h1 class="text-center">Top Trending</h1>
-<!--           <form ng-submit="searchSymbols()">
-            <div class="input-group">
-              <input type="text" class="form-control input-lg" ng-list ng-trim="true" ng-model="symbols" name="text" placeholder="Search for...">
-              <span class="input-group-btn">
-                <input class="btn btn-primary btn-lg" type="submit" id="submit" value="Search Symbols">Go!</input>
-              </span>
+          <div class="row">
+            <div class="col-xs-12 col-md-6">
+              <h2>Business Times</h2>
+              <ul>
+                <li ng-repeat="article in firebaseBusinessTimesNews">
+                  <h3><a href="{{article.url}}" target="_blank">{{article.title}}</a></h3>
+                  <b>{{article.date}}</b>
+                  <p>{{article.summary}}</p>
+                </li>
+              </ul>            
             </div>
-          </form>
- -->          <ol>
+            <div class="col-xs-12 col-md-6">
+              <h2>Reuters</h2>
+              <ul>
+                <li ng-repeat="article in firebaseReutersNews">
+                  <h3><a href="{{article.url}}" target="_blank">{{article.title}}</a></h3>
+                  <b>{{article.date}}</b>
+                  <p>{{article.summary}}</p>
+                </li>
+              </ul>            
+            </div>
+          </div>
+
+<!--           <h1 class="text-center">Top Trending</h1>
+          <ol>
             <li ng-repeat="stock in firebaseStocks | orderBy:'changePercent':true">
               <div class="symbol">
                 <span class="symbol-text">{{stock.symbol}}</span>
@@ -87,7 +95,7 @@
               </div>
             </li>
           </ol>
-        </div>
+ -->        </div>
       </div>
     </div>
 

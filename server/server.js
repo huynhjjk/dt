@@ -16,6 +16,7 @@ var server = app.listen(3000, 'localhost', function () {
 	var port = server.address().port
 
 	var rootRef = new Firebase('https://dt-app.firebaseio.com/');
+	var businessTimesRef = rootRef.child('businessTimes')
 	var reutersRef = rootRef.child('reuters')
 
 	console.log('News Crawler listening at http://%s:%s', host, port)
@@ -118,28 +119,33 @@ var server = app.listen(3000, 'localhost', function () {
 
 	/* END OF REUTERS */
 
-	var addToFirebase = function(data) {
+	var addBusinessTimesToFirebase = function(data) {
+		businessTimesRef.remove();
+		for (var i = 0; i < data.length; i++) {
+			businessTimesRef.push(data[i]);
+		}
+		console.log('Sent Business Times to Firebase');
+	}
+
+	var addReutersToFirebase = function(data) {
+		reutersRef.remove();
 		for (var i = 0; i < data.length; i++) {
 			reutersRef.push(data[i]);
 		}
-		console.log('Sent to Firebase');
+		console.log('Sent Reuters to Firebase');
 	}
 
-	// Clear Previous Data
-	reutersRef.remove();
 	console.log('Cleared Firebase');
 
 	getBusinessTimesUrls('crude oil').then(function(urls) {
 		getAllBusinessTimesArticles(urls).then(function(data){
-			console.log('Business Times');
-			addToFirebase(data);
+			addBusinessTimesToFirebase(data);
 		});
 	});
 
 	getReutersUrls('crude oil').then(function(urls) {
 		getAllReutersArticles(urls).then(function(data){
-			console.log('Reuters');
-			addToFirebase(data);
+			addReutersToFirebase(data);
 		});
 	});
 
