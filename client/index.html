@@ -39,23 +39,37 @@
         <div class="container">
 
           <h1 class="text-center">Crude Oil News</h1>
-          <ul>
-            <li ng-repeat="article in firebaseNews">
-              <h3><a href="{{article.url}}" target="_blank">{{article.title}}</a></h3>
-              <b>{{article.date}}</b>
-              <p>{{article.summary}}</p>
-            </li>
-          </ul>
-          <h1 class="text-center">Top Trending</h1>
-<!--           <form ng-submit="searchSymbols()">
-            <div class="input-group">
-              <input type="text" class="form-control input-lg" ng-list ng-trim="true" ng-model="symbols" name="text" placeholder="Search for...">
-              <span class="input-group-btn">
-                <input class="btn btn-primary btn-lg" type="submit" id="submit" value="Search Symbols">Go!</input>
-              </span>
+          <div class="row">
+            <div class="col-xs-12 col-md-6">
+              <h2>Business Times</h2>
+              <ul>
+                <li ng-repeat="article in firebaseBusinessTimesNews">
+                  <h3><a href="{{article.url}}" target="_blank">{{article.title}}</a></h3>
+                  <b>{{article.date}}</b>
+                  <!--<p>{{article.summary}}</p>-->
+                  <pre>{{article.sentiments}}</pre>
+                  <button ng-click="generate(article, article.countBusiness, 'business' )" >graph</button> 
+                  <div id="article_business_{{article.countBusiness}}"></div>         
+                </li>
+              </ul>            
             </div>
-          </form>
- -->          <ol>
+            <div class="col-xs-12 col-md-6">
+              <h2>Reuters</h2>
+              <ul>
+                <li ng-repeat="article in firebaseReutersNews">
+                  <h3><a href="{{article.url}}" target="_blank">{{article.title}}</a></h3>
+                  <b>{{article.date}}</b>
+                  <!--<p>{{article.summary}}</p>-->
+                  <pre>{{article.sentiments}}</pre>                  
+                  <button ng-click="generate(article, article.countReuters, 'reuters')" >graph</button>
+                  <div id="article_reuters_{{article.countReuters}}"></div>
+                </li>
+              </ul>            
+            </div>
+          </div>
+
+<!--           <h1 class="text-center">Top Trending</h1>
+          <ol>
             <li ng-repeat="stock in firebaseStocks | orderBy:'changePercent':true">
               <div class="symbol">
                 <span class="symbol-text">{{stock.symbol}}</span>
@@ -87,7 +101,7 @@
               </div>
             </li>
           </ol>
-        </div>
+ -->        </div>
       </div>
     </div>
 
@@ -107,7 +121,14 @@
 
     <script src="js/app.js"></script>
     <script src="js/navigation-bar-controller.js"></script>
-    <script src="js/firebase-controller.js"></script>    
+    <script src="js/firebase-controller.js"></script>   
+
+    <!-- d3 -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.5/d3.min.js"></script>
+    <!-- c3 -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/c3/0.4.10/c3.min.js"></script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/c3/0.4.10/c3.css"></script>    
 
     <!-- Sample Data -->
     <script src="sample/sample-tech-data.js"></script>
