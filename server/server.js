@@ -4,7 +4,11 @@ var Firebase = require('firebase');
 var express = require('express');
 var cheerio = require('cheerio');
 var app = express();
-
+var dictionaryFile = require('../js/dictionary.js');
+var dictionary = dictionaryFile.dictionary;
+var onlyWords = dictionaryFile.onlyWords;
+var countBusiness = 0;
+var countReuters = 0;
 
 app.get('/', function (req, res) {
 	res.send('Hello World!')
@@ -18,6 +22,63 @@ var server = app.listen(3000, 'localhost', function () {
 	var rootRef = new Firebase('https://dt-app.firebaseio.com/');
 	var businessTimesRef = rootRef.child('businessTimes')
 	var reutersRef = rootRef.child('reuters')
+
+	 //return an object with its sentiment score about a particular article
+	  var calculateSentimentScore = function(abstract, dictionary, onlyWords){
+	    var scoreObject = {
+	      positive: 0,
+	      both: 0,
+	      negative: 0,
+	      neutral: 0,
+	      weakLevel: 0,
+	      strongLevel: 0,
+	      testedWords: []
+	    };
+
+      var listOfWords = abstract.replace(/[\n\r]/g, "").split(/[ .]+/);
+      //iterate and evaluate each word in sentence
+      for(var j = 0; j < listOfWords.length; j++){
+        var currentWord = listOfWords[j];       
+        //if current word is in the dictionary
+         if(onlyWords.indexOf(currentWord) != -1 && currentWord != ""){
+            for(var k = 0; k < dictionary.length; k++){
+              var wordInDictionary = dictionary[k].word;
+              if(currentWord == wordInDictionary){
+                scoreObject.testedWords.push(currentWord);
+                //scoreObject['abstract'] = abstract;
+                  switch(dictionary[k].connotation){
+                    case "negative":
+                      if (dictionary[k].level == "strongsubj"){
+                        scoreObject.negative++;  
+                      }
+                      scoreObject.negative++;
+                      break;
+                    case "positive":
+                      if (dictionary[k].level == "strongsubj"){
+                        scoreObject.positive++;  
+                      }                    
+                      scoreObject.positive++;
+                      break; 
+                    case "neutral":
+                      scoreObject.neutral++;
+                    case "both":
+                      scoreObject.both++;
+                      break;
+                  }
+                  switch(dictionary[k].level){
+                    case "strongsubj":
+                    scoreObject.strongLevel++;
+                    break;
+                    case "weaksubj":
+                    scoreObject.weakLevel++;
+                    break;
+                  }
+              }
+            }
+         }
+      }
+	    return scoreObject;
+	  }
 
 	console.log('News Crawler listening at http://%s:%s', host, port)
 
@@ -46,13 +107,21 @@ var server = app.listen(3000, 'localhost', function () {
 		request(url, function (error, response, body) {
 		  if (!error && response.statusCode == 200) {
 		    var $ = cheerio.load(body);
+
 		    var data = {
 		    	url: url,
 		    	title: $('h1.headline').text(),
 		    	date: $('#node_article_full_group_content > time').text(),
 		    	summary: $('#node_article_full_group_content').children().next().text() + ' ',
+<<<<<<< HEAD
 		    	source: 'Business Times'
+=======
+		    	source: 'Business Times',
+		    	countBusiness: countBusiness,
+		    	sentiments: calculateSentimentScore($('#node_article_full_group_content').children().next().text() + ' ', dictionary, onlyWords)
+>>>>>>> kevin
 		    }
+		    countBusiness++;
 			deferred.resolve(data);
 		  }
 		});
@@ -100,8 +169,15 @@ var server = app.listen(3000, 'localhost', function () {
 		    	title: $('h1.article-headline').text(),
 		    	date: $('span.timestamp').text(),
 		    	summary: $('#articleText').children().text() + ' ',
+<<<<<<< HEAD
 		    	source: 'Reuters'
+=======
+		    	source: 'Reuters',
+		    	countReuters: countReuters,
+				sentiments: calculateSentimentScore($('#articleText').children().text() + ' ', dictionary, onlyWords)
+>>>>>>> kevin
 		    }
+		    countReuters++;
 			deferred.resolve(data);
 		  }
 		});
