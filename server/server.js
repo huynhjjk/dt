@@ -113,13 +113,9 @@ var server = app.listen(3000, 'localhost', function () {
 		    	title: $('h1.headline').text(),
 		    	date: $('#node_article_full_group_content > time').text(),
 		    	summary: $('#node_article_full_group_content').children().next().text() + ' ',
-<<<<<<< HEAD
-		    	source: 'Business Times'
-=======
 		    	source: 'Business Times',
 		    	countBusiness: countBusiness,
 		    	sentiments: calculateSentimentScore($('#node_article_full_group_content').children().next().text() + ' ', dictionary, onlyWords)
->>>>>>> kevin
 		    }
 		    countBusiness++;
 			deferred.resolve(data);
@@ -169,13 +165,9 @@ var server = app.listen(3000, 'localhost', function () {
 		    	title: $('h1.article-headline').text(),
 		    	date: $('span.timestamp').text(),
 		    	summary: $('#articleText').children().text() + ' ',
-<<<<<<< HEAD
-		    	source: 'Reuters'
-=======
 		    	source: 'Reuters',
 		    	countReuters: countReuters,
 				sentiments: calculateSentimentScore($('#articleText').children().text() + ' ', dictionary, onlyWords)
->>>>>>> kevin
 		    }
 		    countReuters++;
 			deferred.resolve(data);
