@@ -47,6 +47,7 @@
                   <h3><a href="{{article.url}}" target="_blank">{{article.title}}</a></h3>
                   <b>{{article.date}}</b>
                   <!--<p>{{article.summary}}</p>-->
+                  <p>Sentiment Score: {{article.score.score}}</p>
                   <pre>{{article.sentiments}}</pre>
                   <button ng-click="generate(article, article.countBusiness, 'business' )" >graph</button> 
                   <div id="article_business_{{article.countBusiness}}"></div>         
@@ -59,6 +60,7 @@
                 <li ng-repeat="article in firebaseReutersNews">
                   <h3><a href="{{article.url}}" target="_blank">{{article.title}}</a></h3>
                   <b>{{article.date}}</b>
+                  <p>Sentiment Score: {{article.score.score}}</p>                  
                   <!--<p>{{article.summary}}</p>-->
                   <pre>{{article.sentiments}}</pre>                  
                   <button ng-click="generate(article, article.countReuters, 'reuters')" >graph</button>

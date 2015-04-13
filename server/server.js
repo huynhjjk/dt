@@ -3,8 +3,10 @@ var Q = require('q');
 var Firebase = require('firebase');
 var express = require('express');
 var cheerio = require('cheerio');
+var sentiment = require('sentiment');
 var app = express();
-var dictionaryFile = require('../js/dictionary.js');
+var dictionaryFile = require('./utilities/dictionary.js');
+console.log(dictionaryFile);
 var dictionary = dictionaryFile.dictionary;
 var onlyWords = dictionaryFile.onlyWords;
 var countBusiness = 0;
@@ -107,7 +109,7 @@ var server = app.listen(3000, 'localhost', function () {
 		request(url, function (error, response, body) {
 		  if (!error && response.statusCode == 200) {
 		    var $ = cheerio.load(body);
-
+		    //console.log(sentiment($('#node_article_full_group_content').children().next().text() + ' '));
 		    var data = {
 		    	url: url,
 		    	title: $('h1.headline').text(),
@@ -115,7 +117,9 @@ var server = app.listen(3000, 'localhost', function () {
 		    	summary: $('#node_article_full_group_content').children().next().text() + ' ',
 		    	source: 'Business Times',
 		    	countBusiness: countBusiness,
-		    	sentiments: calculateSentimentScore($('#node_article_full_group_content').children().next().text() + ' ', dictionary, onlyWords)
+		    	sentiments: calculateSentimentScore($('#node_article_full_group_content').children().next().text() + ' ', dictionary, onlyWords),
+		    	score: sentiment($('#node_article_full_group_content').children().next().text() + ' ')
+
 		    }
 		    countBusiness++;
 			deferred.resolve(data);
@@ -167,7 +171,9 @@ var server = app.listen(3000, 'localhost', function () {
 		    	summary: $('#articleText').children().text() + ' ',
 		    	source: 'Reuters',
 		    	countReuters: countReuters,
-				sentiments: calculateSentimentScore($('#articleText').children().text() + ' ', dictionary, onlyWords)
+				sentiments: calculateSentimentScore($('#articleText').children().text() + ' ', dictionary, onlyWords),
+				score: sentiment($('#articleText').children().text() + ' ')
+
 		    }
 		    countReuters++;
 			deferred.resolve(data);
