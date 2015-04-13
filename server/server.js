@@ -6,7 +6,6 @@ var cheerio = require('cheerio');
 var sentiment = require('sentiment');
 var app = express();
 var dictionaryFile = require('./utilities/dictionary.js');
-console.log(dictionaryFile);
 var dictionary = dictionaryFile.dictionary;
 var onlyWords = dictionaryFile.onlyWords;
 var countBusiness = 0;
@@ -209,13 +208,16 @@ var server = app.listen(3000, 'localhost', function () {
 		console.log('Sent Reuters to Firebase');
 	}
 
-	getBusinessTimesUrls('crude oil').then(function(urls) {
+	var searchQuery = 'crude oil';
+	console.log('Searching for articiles on: ' + searchQuery);
+
+	getBusinessTimesUrls(searchQuery).then(function(urls) {
 		getAllBusinessTimesArticles(urls).then(function(data){
 			addBusinessTimesToFirebase(data);
 		});
 	});
 
-	getReutersUrls('crude oil').then(function(urls) {
+	getReutersUrls(searchQuery).then(function(urls) {
 		getAllReutersArticles(urls).then(function(data){
 			addReutersToFirebase(data);
 		});
